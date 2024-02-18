@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login</title>
+
+  <style>
+    body {
+      background-color: #121212;
+      color: #ffffff;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    form {
+      background-color: #212121;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+      max-width: 400px;
+      width: 100%;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: #61dafb;
+    }
+
+    input {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 16px;
+      box-sizing: border-box;
+      background-color: #333333;
+      color: #ffffff;
+      border: 1px solid #61dafb;
+      border-radius: 4px;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      box-sizing: border-box;
+      background-color: #4caf50;
+      color: #ffffff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+
+  <form id="loginForm">
+    <label for="email">Email:</label>
+    <input type="email" id="email" required>
+
+    <label for="senha">Senha:</label>
+    <input type="password" id="senha" required>
+
+    <button type="button" onclick="realizarLogin()">Entrar</button>
+  </form>
+
+  <!-- Use as versões 8.x do Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
+  <script>
+    // Sua configuração do Firebase aqui
+    const firebaseConfig = {
+      apiKey: "AIzaSyDCbwBdDYkJfpr-hiIri7LNru8ri3fWzvQ",
+      authDomain: "crm01-e88b2.firebaseapp.com",
+      projectId: "crm01-e88b2",
+      storageBucket: "crm01-e88b2.appspot.com",
+      messagingSenderId: "258444086081",
+      appId: "1:258444086081:web:46e0da45b03b5bdf392fc0",
+      measurementId: "G-EEZCZJM33V"
+    };
+  
+    // Inicialize o Firebase usando a versão antiga
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const firestore = firebase.firestore();
+  
+    function realizarLogin() {
+      const email = document.getElementById('email').value;
+      const senha = document.getElementById('senha').value;
+  
+      auth.signInWithEmailAndPassword(email, senha)
+        .then((userCredential) => {
+          // Login bem-sucedido
+          const user = userCredential.user;
+          console.log("Usuário logado com sucesso:", user);
+  
+          // Salvar informações do usuário no Firestore
+          salvarInformacoesDoUsuario(user);
+  
+          // Redirecionamento para a página crm.html
+          window.location.href = 'crm.html';
+        })
+        .catch((error) => {
+          // Se ocorrer um erro durante o login
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          console.error("Erro ao realizar login:", errorCode, errorMessage);
+        });
+    }
+  
+    function salvarInformacoesDoUsuario(user) {
+      const email = user.email;
+      const uid = user.uid;
+  
+      // Exemplo de dados a serem salvos
+      const dadosUsuario = {
+        email: email,
+        // Outras informações que você deseja salvar...
+      };
+  
+      // Adiciona um documento à coleção 'usuarios' com um ID gerado automaticamente
+      firestore.collection('usuarios').add(dadosUsuario)
+        .then((docRef) => {
+          console.log("Informações do usuário salvas com sucesso. ID do documento:", docRef.id);
+        })
+        .catch((error) => {
+          console.error("Erro ao salvar informações do usuário:", error);
+        });
+    }
+  </script>
+  </body>
+  </html>

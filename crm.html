@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://unpkg.com/interactjs@1.10.11/dist/interact.min.css" />
+  <script src="https://unpkg.com/interactjs@1.10.11/dist/interact.min.js"></script>
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      margin: 0;
+      background-color: rgb(221, 221, 221);
+    }
+
+    .top-bar {
+      background-color: rgb(20, 20, 20);
+      color: white;
+      padding: 8px;
+      text-align: center;
+      position: relative;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .profile-circle {
+      width: 40px;
+      height: 40px;
+      background-color: #fff;
+      border-radius: 50%;
+    }
+
+    .profile-name {
+      margin-left: 10px;
+    }
+
+    .logout-button {
+      background-color: #ff0606;
+      color: white;
+      padding: 10px 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      left: 164vh;
+      top: 3vh;
+    }
+
+    .columns-container {
+      display: flex;
+      justify-content: space-around;
+    }
+
+    .column {
+      width: 200px;
+      height: 400px;
+      border: 2px solid #ccc;
+      background-color: #ffffff;
+      position: relative;
+      margin: 0 1px;
+      border-radius: 20px;
+      overflow-y: auto;
+      overflow-x: hidden;
+      top: 15vh;
+    }
+
+    .column::-webkit-scrollbar {
+      width: 12px;
+    }
+
+    .column::-webkit-scrollbar-thumb {
+      background-color: #888;
+      border-radius: 6px;
+    }
+
+    .column::-webkit-scrollbar-track {
+      background-color: #ddd;
+    }
+
+    .draggable {
+      width: 150px;
+      height: 75px;
+      background-color: #2b2b2b;
+      position: relative;
+      cursor: grab;
+      margin-bottom: 10px;
+      border-radius: 10px;
+      left: 2vh;
+      top: 3vh;
+      user-select: none;
+      transition: transform 0.3s ease;
+    }
+
+    .selected {
+      background-color: #4CAF50;
+    }
+
+    button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 4px 9px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      position: absolute;
+      top: 17vh;
+      left: 2vh;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    .column {
+      text-align: center;
+    }
+
+    .column h2 {
+      margin: 0;
+      padding: 10px;
+      background-color: #333;
+      color: white;
+      border-radius: 10px 10px 0 0;
+    }
+
+    button#saveInfoButton {
+      background-color: #022c04;
+      color: white;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      position: absolute;
+      left: 5vh;
+    }
+
+    button#saveInfoButton:hover {
+      background-color: #45a049;
+    }
+
+    .popup {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: #fefefe;
+      padding: 30px;
+      border-radius: 10px;
+      z-index: 2;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      height: 200px;
+      width: 300px;
+      max-width: 80%;
+    }
+
+    .popup label,
+    .popup input,
+    .popup button {
+      display: block;
+      margin-bottom: 10px;
+    }
+
+    .popup label {
+      font-weight: bold;
+    }
+
+    .popup input {
+      width: 100%;
+      padding: 8px;
+      box-sizing: border-box;
+    }
+
+    .popup button {
+      background-color: #008805;
+      color: white;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      top: 32vh;
+      left: 22vh;
+    }
+
+    .popup button:hover {
+      background-color: #45a049;
+    }
+
+    .popup-background {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 1;
+    }
+
+    .draggable span {
+      font-family: 'Arial', sans-serif;
+      font-size: 14px;
+      font-weight: bold;
+      padding: 5px;
+      display: inline-block;
+      border-radius: 5px;
+      background-color: #2b2b2b;
+      top: 2vh;
+      left: 3vh;
+      position: absolute;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="top-bar">
+    <div>
+      <div class="profile-circle"></div>
+    </div>
+    <button class="logout-button" onclick="logout()"></button>
+    <!-- Adicione esta linha no início do corpo do HTML -->
+<div class="popup-background" id="popupBackground" onclick="closePopup()"></div>
+
+  </div>
+
+  <div class="columns-container">
+    <div class="column" id="column1">
+      <h2>Prospecção</h2>
+    </div>
+    <div class="column" id="column2">
+      <h2>Contato Inicial</h2>
+    </div>
+    <div class="column" id="column3">
+      <h2>Negociação</h2>
+    </div>
+    <div class="column" id="column4">
+      <h2>Fechou</h2>
+    </div>
+    <div class="column" id="column5">
+      <h2>Não Fechou</h2>
+    </div>
+  </div>
+  <div class="popup" id="popup">
+    <label for="name">Nome:</label>
+    <input type="text" id="name" name="name" required>
+    <label for="phone">Telefone:</label>
+    <input type="text" id="phone" name="phone" required>
+    <button onclick="addDraggable()">Adicionar</button>
+  </div>
+
+  <!-- Novo pop-up para editar informações -->
+  <div class="popup" id="editPopup">
+    <label for="editName">Nome:</label>
+    <input type="text" id="editName" name="editName" required>
+    <label for="editPhone">Telefone:</label>
+    <input type="text" id="editPhone" name="editPhone" required>
+    <button id="saveInfoButton" onclick="saveInfo()">Salvar</button>
+    <button onclick="closeInfoPopup()">Fechar</button>
+  </div>
+
+  <!-- Novo pop-up para exibir e editar informações -->
+  <div class="popup" id="infoPopup">
+    <label for="editName">Nome:</label>
+    <input type="text" id="editName" name="editName" required>
+    <label for="editPhone">Telefone:</label>
+    <input type="text" id="editPhone" name="editPhone" required>
+    <button onclick="saveInfo()">Salvar</button>
+    <button onclick="closeInfoPopup()">Fechar</button>
+    <div id="confirmationMessage" style="display: none;"></div>
+  </div>
+
+  <!-- Novo pop-up para exibir informações -->
+  <div class="popup" id="viewInfoPopup">
+    <div id="infoContent"></div>
+    <button onclick="editInfo()">Editar</button>
+  </div>
+  <div class="popup-background" id="infoPopupBackground" onclick="closeInfoPopup()"></div>
+
+  <button onclick="openPopup()">+</button>
+
+  <script>
+    interact('.draggable')
+      .draggable({
+        inertia: true,
+        autoScroll: true,
+        onstart: function (event) {
+          event.target.classList.add('selected');
+        },
+        onend: function (event) {
+          event.target.classList.remove('selected');
+        }
+      })
+      .on('tap', function (event) {
+        var name = event.currentTarget.querySelector('span').textContent.split('\n')[0];
+        var phone = event.currentTarget.querySelector('span').textContent.split('\n')[1];
+        showInfoPopup(name, phone);
+      });
+
+    interact('.column')
+      .dropzone({
+        accept: '.draggable',
+        ondrop: function (event) {
+          var draggedElement = document.querySelector('.selected');
+          var destinationColumn = event.target.closest(".column");
+
+          if (destinationColumn) {
+            destinationColumn.appendChild(draggedElement);
+          }
+
+          draggedElement.classList.remove('selected');
+        }
+      });
+
+      function openPopup() {
+  var popup = document.getElementById("popup");
+  var popupBackground = document.getElementById("popupBackground");
+
+  popup.style.display = "block";
+  popupBackground.style.display = "block";
+}
+
+
+function closePopup() {
+  var popup = document.getElementById("popup");
+  var popupBackground = document.getElementById("popupBackground");
+
+  popup.style.display = "none";
+  popupBackground.style.display = "none";
+}
+    function showInfoPopup(name, phone) {
+      var infoPopup = document.getElementById("editPopup");
+      var infoPopupBackground = document.getElementById("infoPopupBackground");
+      var editNameInput = document.getElementById("editName");
+      var editPhoneInput = document.getElementById("editPhone");
+
+      editNameInput.value = name;
+      editPhoneInput.value = phone;
+
+      infoPopup.style.display = "block";
+      infoPopupBackground.style.display = "block";
+    }
+
+    function closeInfoPopup() {
+      var infoPopup = document.getElementById("infoPopup");
+      var infoPopupBackground = document.getElementById("infoPopupBackground");
+
+      infoPopup.style.display = "none";
+      infoPopupBackground.style.display = "none";
+    }
+
+    function saveInfo() {
+  var infoPopup = document.getElementById("editPopup");
+  var infoPopupBackground = document.getElementById("infoPopupBackground");
+  var editNameInput = document.getElementById("editName");
+  var editPhoneInput = document.getElementById("editPhone");
+
+  var name = editNameInput.value;
+  var phone = editPhoneInput.value;
+
+  if (name && phone) {
+    var infoContent = document.getElementById("infoContent");
+    infoContent.innerHTML = `<strong>Nome:</strong> ${name}<br><strong>Telefone:</strong> ${phone}`;
+
+    closeInfoPopup();
+
+    var confirmationMessage = document.getElementById("confirmationMessage");
+    confirmationMessage.innerHTML = "Alterações salvas com sucesso!";
+    confirmationMessage.style.color = "green";
+    confirmationMessage.style.display = "block";
+
+    setTimeout(function () {
+      closeInfoPopup();
+      confirmationMessage.innerHTML = "";
+      confirmationMessage.style.display = "none";
+    }, 2000);
+  } else {
+    alert("Por favor, preencha todos os campos.");
+  }
+}
+
+    function editInfo() {
+      var infoContent = document.getElementById("infoContent");
+      infoContent.innerHTML += "<br>Edição desativada";
+    }
+
+    function addDraggable() {
+      var popup = document.getElementById("popup");
+      var popupBackground = document.getElementById("popupBackground");
+
+      var nameInput = document.getElementById("name");
+      var phoneInput = document.getElementById("phone");
+
+      var name = nameInput.value;
+      var phone = phoneInput.value;
+
+      if (name && phone) {
+        var firstColumn = document.getElementById("column1");
+        var newDraggable = document.createElement("div");
+        newDraggable.className = "draggable";
+
+        var textSpan = document.createElement("span");
+        textSpan.style.color = "white";
+        textSpan.style.textAlign = "center";
+        textSpan.style.fontFamily = "Arial, sans-serif";
+        textSpan.style.fontSize = "14px";
+        textSpan.style.fontWeight = "bold";
+        textSpan.style.padding = "5px";
+        textSpan.style.display = "inline-block";
+        textSpan.style.borderRadius = "5px";
+        textSpan.style.backgroundColor = "#2b2b2b";
+
+        textSpan.innerHTML = `${name}<br>${phone}`;
+
+        newDraggable.appendChild(textSpan);
+        firstColumn.appendChild(newDraggable);
+
+        nameInput.value = "";
+        phoneInput.value = "";
+
+        closePopup();
+        showInfoPopup(name, phone);
+      } else {
+        alert("Por favor, preencha todos os campos.");
+      }
+    }
+
+    function logout() {
+      history.pushState(null, null, 'login.html');
+      window.location.href = 'login.html';
+    }
+  </script>
+</body>
+
+</html>

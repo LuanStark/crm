@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registro de Usuário</title>
+
+  <style>
+    body {
+      background-color: #121212;
+      color: #ffffff;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    form {
+      background-color: #212121;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+      max-width: 400px;
+      width: 100%;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: #61dafb;
+    }
+
+    input {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 16px;
+      box-sizing: border-box;
+      background-color: #333333;
+      color: #ffffff;
+      border: 1px solid #61dafb;
+      border-radius: 4px;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      box-sizing: border-box;
+      background-color: #4caf50;
+      color: #ffffff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+
+  <form id="registroForm">
+    <label for="email">Email:</label>
+    <input type="email" id="email" required>
+
+    <label for="senha">Senha:</label>
+    <input type="password" id="senha" required>
+
+    <button type="button" onclick="registrarUsuario()">Registrar</button>
+  </form>
+
+  <!-- Use as versões 8.x do Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+
+  <script>
+    // Sua configuração do Firebase aqui
+    const firebaseConfig = {
+      apiKey: "AIzaSyDCbwBdDYkJfpr-hiIri7LNru8ri3fWzvQ",
+      authDomain: "crm01-e88b2.firebaseapp.com",
+      projectId: "crm01-e88b2",
+      storageBucket: "crm01-e88b2.appspot.com",
+      messagingSenderId: "258444086081",
+      appId: "1:258444086081:web:46e0da45b03b5bdf392fc0",
+      measurementId: "G-EEZCZJM33V"
+    };
+
+    // Inicialize o Firebase usando a versão antiga
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
+    // Função para registrar um novo usuário
+    function registrarUsuario() {
+      const email = document.getElementById('email').value;
+      const senha = document.getElementById('senha').value;
+
+      auth.createUserWithEmailAndPassword(email, senha)
+        .then((userCredential) => {
+          // Registro bem-sucedido
+          const user = userCredential.user;
+          console.log("Usuário registrado com sucesso:", user);
+        })
+        .catch((error) => {
+          // Se ocorrer um erro durante o registro
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          console.error("Erro ao registrar usuário:", errorCode, errorMessage);
+        });
+    }
+  </script>
+</body>
+</html>
